@@ -1,13 +1,36 @@
 import os
 import torch
 import faiss
+import json
 import pandas as pd
 from PIL import Image
 from transformers import CLIPModel, CLIPProcessor
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-from oauth2client.client import GoogleCredentials
+from dotenv import load_dotenv
 
+
+load_dotenv()
+
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
+# Write client_secrets.json dynamically
+client_secrets ={
+    "installed": {
+      "client_id": CLIENT_ID,
+      "project_id": "rugged-memory-416404",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_secret": CLIENT_SECRET,
+      "redirect_uris": ["http://localhost"]
+    }
+  }
+  
+
+with open('client_secrets.json', 'w') as f:
+    json.dump(client_secrets, f)
 
 # Authenticate and create the PyDrive client
 def authenticate_drive():
