@@ -1,1 +1,8 @@
 streamlit>=1.26.0
+transformers
+faiss-cpu
+torch
+pandas
+kaggle
+PIL
+pydrive
