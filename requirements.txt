@@ -7,3 +7,4 @@ kaggle
 pydrive
 oauth2client
 pillow
+python-dotenv
