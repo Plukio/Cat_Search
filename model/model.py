@@ -9,6 +9,7 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from dotenv import load_dotenv
 
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 load_dotenv()
 
@@ -24,7 +25,7 @@ client_secrets ={
       "token_uri": "https://oauth2.googleapis.com/token",
       "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
       "client_secret": CLIENT_SECRET,
-      "redirect_uris": ["http://localhost"]
+      "redirect_uris": ["http://localhost:8501"]
     }
   }
   
@@ -52,11 +53,14 @@ drive = authenticate_drive()
 model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
+index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'asset', 'cats.index'))
+index = faiss.read_index(index_path)
+txt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'asset', 'paths.txt'))
+csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'asset', 'file_ids.csv'))
 
-index = faiss.read_index('/cat_search/asset/cats.index')
-with open('/cat_search/asset/paths.txt', 'r') as f:
-       image_paths = [line.strip().split('/cat-breeds')[1] for line in f.readlines()]
-im_id = pd.read_csv('/cat_search/asset/file_ids.csv')
+with open(txt_path, 'r') as f:
+       image_paths = [line.strip() for line in f.readlines()]
+im_id = pd.read_csv(csv_path)
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -70,18 +74,20 @@ def query(text_input):
 
     lst_img = []
     _, indices = index.search(text_features, 1)
-    path = image_paths[indices[0]].split('/')[-1]
+    path = image_paths[indices[0][0]].split('/')[-1]
 
     for i in range(1):
         file_row = im_id[im_id['Title'] == path]
-        file_id = file_row['id'].values[0]
-        destination_path = '/cat_search/asset/images' + path
-        download_file_from_drive(file_id, destination_path)
+        file_id = file_row['ID'].values[0]
+        dow_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'asset', 'images'))
+
+        destination_path = dow_path + path
+        download_file_from_drive(file_id, destination_path, drive)
         img = Image.open(destination_path)
         lst_img.append(img)
     
     return lst_img
 
-def download_file_from_drive(file_id, destination):
+def download_file_from_drive(file_id, destination, drive):
     file = drive.CreateFile({'id': file_id})
     file.GetContentFile(destination)
