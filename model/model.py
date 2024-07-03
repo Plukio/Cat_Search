@@ -6,11 +6,21 @@ from PIL import Image
 from transformers import CLIPModel, CLIPProcessor
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+from oauth2client.client import GoogleCredentials
+
 
 # Authenticate and create the PyDrive client
 def authenticate_drive():
     gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()  # Creates local webserver and automatically handles authentication
+    gauth.LoadClientConfigFile("client_secrets.json")
+    gauth.LoadCredentialsFile("credentials.json")
+    if gauth.credentials is None:
+        gauth.LocalWebserverAuth()
+    elif gauth.access_token_expired:
+        gauth.Refresh()
+    else:
+        gauth.Authorize()
+    gauth.SaveCredentialsFile("credentials.json")
     drive = GoogleDrive(gauth)
     return drive
 

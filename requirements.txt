@@ -4,5 +4,6 @@ faiss-cpu
 torch
 pandas
 kaggle
-PIL
 pydrive
+oauth2client
+pillow
