@@ -1,7 +1,23 @@
-Clone the repository
+Getting Started
+Follow these steps to set up and run the project:
 
-Run 'pip install -r requirements.txt'
+1. Clone the Repository
+bash
+git clone https://github.com/Plukio/Cat_Search.git
+cd /cat_search
 
-Run 'streamlit run main.py'
+2. Install Dependencies
+bash
+pip install -r requirements.txt
 
-Enjoy!!!
+3. Run the Streamlit App
+bash
+streamlit run main.py
+
+4. Google Authentication
+After being redirected to your localhost website, you will be asked to log in with Google to access cat images stored in Google Drive without having to manually download them yourself. Follow these steps:
+- Click "Advanced".
+- Click "Trust Cats Project".
+
+5. Enjoy!
+Once authenticated, you can start searching for and viewing cat images directly through the web interface.
